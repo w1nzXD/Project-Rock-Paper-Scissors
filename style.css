@@ -1,0 +1,18 @@
+#button-container {
+    display: flex;
+    gap: 20px;
+    justify-content: space-evenly;
+}
+
+button {
+    background-color: rgb(228, 225, 225);
+    font-size: large;
+    border-radius: 4px;
+}
+
+.results-container {
+    background-color: pink;
+    font-size: medium;
+    white-space: pre-line;
+}
+    

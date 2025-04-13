@@ -1,79 +1,123 @@
-console.log("hello world")
-console.log(" ")
+// Step 1 - Set a play button;
+const startButton = document.createElement("button");
+startButton.textContent = "Start a game";
+document.body.appendChild(startButton);
 
-function getComputerChoice()    {
-    let a = Math.random();
-    if (a <= 0.33) {
-        x = "rock";
-    }   else if (0.33 < a && a <= 0.66)   {
-        x = "paper";
-    }   else{
-        x = "scissors";
+// Step 2 - Set up the playing buttons (rock, paper, scissors) for human; 
+const btnContainer = document.querySelector("#button-container");
+
+const rock = document.createElement("button");
+rock.textContent = "ROCK";
+
+const paper = document.createElement("button");
+paper.textContent = "PAPER";
+
+const scissors = document.createElement("button");
+scissors.textContent = "SCISSORS"
+
+// Step 3 - Activate a play button;
+startButton.addEventListener("click", () => {
+    humanScore = 0;
+    computerScore = 0;
+    round = 0; 
+
+    if (!document.body.contains(btnContainer)) { // adds the button container if you reset a game
+        document.body.append(btnContainer)
+        document.body.appendChild(startButton)
+     } 
+
+    btnContainer.append(rock, paper, scissors); // inserts buttons to play
+
+    if (document.body.contains(results)) { // removes the messages from previous game, if it exists
+        document.body.removeChild(results)
+     } 
+});
+
+// Results and winner divs to display text;
+
+const results = document.createElement("div"); // the container for results
+results.className = "results-container";
+
+const winnerMessage = document.createElement("div");
+winnerMessage.className = "winner-message";
+
+function getComputerChoice () {
+
+    let computerRandomizedPlay = Math.random(); // Returns a random number ]0,1]
+    let computerChoice = "";// Setting the variable that will hold the computer's play (locally stored)
+
+    if (computerRandomizedPlay <= 1/3) { // A third of the time its "Rock"
+        computerChoice = "ROCK";
     }
-    return x;
+    else if (computerRandomizedPlay > 1/3 && computerRandomizedPlay <= 2/3) { // Another third is "Paper"
+        computerChoice = "PAPER";
+    }
+    else { // The rest is "Scissors"
+        computerChoice = "SCISSOR";
+    }
+    return computerChoice // Need to save this in a global variable
 }
 
-function getHumanChoice()   {
-    let b = prompt("Choose rock, paper, or scissors:").toLowerCase();
-    if (b==="rock") {
-        y = "rock";
-    }   else if (b==="paper") {
-        y = "paper";
-    }   else if (b==="scissors")  {
-        y = "scissors";
-    }   else{
-        alert("try again");
-        return getHumanChoice();
-    }
-    return y;
+// Set the functionality of the buttons for the player
+
+function btnHumanChoice (button) {
+    let humanSelection = button.textContent;
+    let computerSelection = getComputerChoice();
+    return playRound(computerSelection, humanSelection)
 }
 
-function playRound(x, y)    {
-    if (x === y)    {
-        console.log('Draw!', x, 'ties ', y, '.');
-    } else if (
-        x === "paper" && y === "rock" ||
-        x === "rock" && y === "scissors" ||
-        x === "scissors" && y === "paper"
-    )   {
-        console.log('You Win!', x, 'beats', y, '.');
-        return "win";
-    } else{
-        console.log('You Lose!', x, 'lose to', y, '.');
-        return 'lose';        
-    }
-}
+rock.addEventListener("click", () => btnHumanChoice(rock));
+paper.addEventListener("click", () => btnHumanChoice(paper));
+scissors.addEventListener("click", () => btnHumanChoice(scissors));
 
-function playGame() {
-    let humanScore = 0
-    let computerScore = 0
+function playRound (computerSelection, humanSelection) {
 
-    for (let i = 1; i <= 5; i++)    {
+    let roundMessage = "";
 
-        const computerSelection = getComputerChoice();
-        const humanSelection = getHumanChoice();
+    document.body.appendChild(results);
 
-        let result = playRound(humanSelection, computerSelection);
+    while (round < 5) {
 
-        console.log("Computer: ", computerSelection);
-        console.log("User: ", humanSelection);
-
-        if (result === "win")   {
-            humanScore += 1
-        } else if (result === "lose")   {
-            computerScore += 1
+        if (computerSelection == humanSelection) { // Draw validation
+            roundMessage = `We have a draw! You played - ${humanSelection}, Computer played - ${computerSelection}`
+            round += 1
+        } 
+        else if ( // Player won
+            (computerSelection == "ROCK" && humanSelection == "PAPER") || 
+            (computerSelection == "PAPER" && humanSelection == "SCISSOR") ||
+            (computerSelection == "SCISSOR" && humanSelection == "ROCK")) {       
+            roundMessage = `You win! You played - ${humanSelection}, Computer played - ${computerSelection}`;
+            humanScore += 1;
+            round += 1;   
+        } else { // Player lost
+            roundMessage = `You lose! You played - ${humanSelection}, Computer played - ${computerSelection}`;
+            computerScore += 1;
+            round += 1
         }
-        console.log("Your Score", humanScore, "Computer Score", computerScore)
-        console.log('');
-    }
 
-    if (humanScore < computerScore) {
-        console.log('You lost! The final score was: YOU', humanScore, 'X COMPUTER', computerScore)
-    } else if (humanScore > computerScore) {
-        console.log('You win! The final score was: YOU', humanScore, 'X COMPUTER', computerScore)
-    } else {
-        console.log('Draw! The final score was: YOU', humanScore, 'X COMPUTER', computerScore)
+        if (round < 5) { // Display results for every round but the last one
+            return results.textContent =
+            `${roundMessage}
+            The current score is:
+            Player - ${humanScore}
+            Computer - ${computerScore}
+            This was round ${round}/5`;
+
+        } else { // Display results for the last round
+
+            btnContainer.remove(rock, paper, scissors)
+            
+
+            if (humanScore > computerScore) { // log the victory screen
+                return results.textContent = `Player wins - Human Supremacy! Final score was Player:${humanScore} to Computer:${computerScore}.`
+            } else if (humanScore < computerScore) {
+                return results.textContent = `Computer wins - lose. Final score was Player:${humanScore} to Computer:${computerScore}.`
+            } else {
+                return results.textContent = `A draw... boring. Final score was Player:${humanScore} to Computer:${computerScore}.`
+            }
+            
+        }
     }
 }
 
-playGame()
+// The same playRound function as before;
